@@ -12,4 +12,8 @@
   .bg {
     @apply bg-zinc-700;
   }
+
+  .hover-outline {
+    @apply cursor-pointer hover:outline hover:outline-2 hover:outline-blue-600;
+  }
 }
