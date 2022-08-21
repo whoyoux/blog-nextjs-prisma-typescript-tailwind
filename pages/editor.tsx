@@ -13,26 +13,64 @@ import { Role } from "@prisma/client";
 import dateFormatter from "../lib/dateFormatter";
 import { PostType } from "../types";
 
-import { TrashSimple, PencilSimple } from "phosphor-react";
+import { TrashSimple, PencilSimple, ArrowsClockwise } from "phosphor-react";
+
+import toast from "react-hot-toast";
 
 type EditorPageType = {
   posts: PostType[];
 };
 
 const Editor: NextPage<EditorPageType> = ({ posts }) => {
-  console.table(posts);
+  const handleUpdateButton = (id: string) => {
+    alert(`Updated post of id: ${id}`);
+  };
+
+  const handleDeleteButton = (id: string) => {
+    alert(`Deleted post of id: ${id}`);
+  };
+
+  const handleRevalidate = async () => {
+    const revalidateToastId = toast.loading("Loading...");
+    try {
+      const response = await fetch(`http://localhost:3000/api/revalidate`);
+      console.log(response);
+      if (!response.ok) {
+        toast.error("Error!", {
+          id: revalidateToastId,
+        });
+      } else {
+        toast.success("Revalidated!", {
+          id: revalidateToastId,
+        });
+      }
+    } catch (err) {
+      toast.error("Error!", {
+        id: revalidateToastId,
+      });
+      console.error(err);
+    }
+  };
+
   return (
     <div>
-      <div className="w-full flex flex-row items-center justify-between mb-8">
+      <div className="w-full flex flex-col sm:flex-row gap-2 sm:gap-0 items-center justify-between mb-8 sm:px-5">
         <h1 className="text-3xl">List of posts:</h1>
-        <button className="btn bg">Create</button>
+        <div className="flex gap-5">
+          <button className="btn bg">Create</button>
+          <button className="btn bg" onClick={handleRevalidate}>
+            <div className="flex flex-row items-center gap-1">
+              Revalidate <ArrowsClockwise className="text-xl" />
+            </div>
+          </button>
+        </div>
       </div>
-      <div className="flex flex-col gap-5">
+      <div className="flex flex-col gap-4 sm:gap-1">
         {posts.map((post) => {
           return (
             <div
               key={post.id}
-              className="flex flex-row items-center justify-between"
+              className="flex flex-row items-center justify-between hover-outline sm:p-5 py -2 rounded-lg"
             >
               <div>
                 <h2 className="text-xl">{post.title}</h2>
@@ -41,10 +79,16 @@ const Editor: NextPage<EditorPageType> = ({ posts }) => {
                 </h4>
               </div>
               <div className="flex gap-4">
-                <button className="btn bg-blue-600 text-xl">
+                <button
+                  className="btn bg-blue-600 text-xl hover:bg-blue-700 transition-all"
+                  onClick={() => handleUpdateButton(post.id)}
+                >
                   <PencilSimple />
                 </button>
-                <button className="btn bg-red-600 text-xl">
+                <button
+                  className="btn bg-red-600 text-xl hover:bg-red-700 transition-all"
+                  onClick={() => handleDeleteButton(post.id)}
+                >
                   <TrashSimple />
                 </button>
               </div>

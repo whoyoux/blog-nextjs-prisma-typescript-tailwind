@@ -5,6 +5,8 @@ import Layout from "../layout/Layout";
 
 import { SessionProvider } from "next-auth/react";
 
+import { Toaster } from "react-hot-toast";
+
 function MyApp({ Component, pageProps: { session, ...pageProps } }: AppProps) {
   return (
     <SessionProvider session={session}>
@@ -13,6 +15,7 @@ function MyApp({ Component, pageProps: { session, ...pageProps } }: AppProps) {
           <Component {...pageProps} />
         </Layout>
       </div>
+      <Toaster position="bottom-right" />
     </SessionProvider>
   );
 }
