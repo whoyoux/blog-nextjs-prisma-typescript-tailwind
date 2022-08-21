@@ -100,7 +100,8 @@ const Editor: NextPage<EditorPageType> = ({ posts }) => {
         toast.success("Updated!", {
           id: editingToastId,
         });
-        handleGoBackToList();
+        // handleGoBackToList();
+        router.reload();
       }
     } catch (err) {
       toast.error("Error!", {
@@ -283,6 +284,7 @@ export const getServerSideProps: GetServerSideProps = async (
 
   const posts = await prisma.post.findMany({
     where: {
+      published: true,
       author: {
         id: user.id,
       },

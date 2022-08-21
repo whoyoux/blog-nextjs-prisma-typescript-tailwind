@@ -71,6 +71,9 @@ const PostPage: NextPage<{ post: Post }> = ({ post }) => {
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const posts = await prisma.post.findMany({
+    where: {
+      published: true,
+    },
     select: {
       id: true,
     },
@@ -115,6 +118,12 @@ export const getStaticProps: GetStaticProps = async (context) => {
       },
     },
   });
+
+  if (!post) {
+    return {
+      notFound: true,
+    };
+  }
 
   // @ts-ignore
   post.createdAt = post?.createdAt.toJSON();
