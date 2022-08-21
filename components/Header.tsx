@@ -2,7 +2,7 @@ import Link from "next/link";
 
 const Header = () => {
   return (
-    <header className="w-full flex flex-row justify-between items-center my-10">
+    <header className="w-full flex flex-row justify-between items-center mt-10 mb-20">
       <h1 className="text-3xl hover:underline">
         <Link href="/">Blog</Link>
       </h1>

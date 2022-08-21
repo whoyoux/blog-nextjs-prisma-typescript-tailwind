@@ -1,0 +1,51 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["referentialIntegrity"]
+}
+
+datasource db {
+  provider             = "mysql"
+  url                  = env("DATABASE_URL")
+  referentialIntegrity = "prisma"
+}
+
+enum Role {
+  USER
+  WRITER
+  MODERATOR
+  ADMIN
+}
+
+model User {
+  id             String   @id @default(cuid())
+  name           String
+  email          String   @unique
+  profilePicture String   @default("https://dummyimage.com/250x250/4b5563/ffffff&text=user")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  Post           Post[]
+  role           Role     @default(USER)
+
+  @@map(name: "users")
+}
+
+model Post {
+  id        String   @id @default(cuid())
+  title     String
+  content   String   @db.LongText
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  published Boolean
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId  String
+  images    Image[]
+}
+
+model Image {
+  id    String @id @default(cuid())
+  url   String
+  posts Post[]
+}

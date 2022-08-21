@@ -1,14 +1,28 @@
 import { createArray } from "dummy-array";
 import Link from "next/link";
 
-const RecentPosts = () => {
+type PostType = {
+  id: string;
+  title: string;
+  content: string;
+  createdAt: string;
+  updatedAt: string;
+  images: [
+    {
+      id: string;
+      url: string;
+    }
+  ];
+};
+
+const RecentPosts = ({ posts }: { posts: PostType[] }) => {
   return (
     <div className="flex sm:flex-row flex-col sm:flex-wrap sm:justify-between w-full mt-20 gap-8 sm:gap-4">
-      {createArray({ to: 6 }).map((index: number) => {
+      {posts.map((post) => {
         return (
-          <Link href={`posts/${index}`} key={index} passHref>
-            <div className="w-full sm:w-[calc(50%-1rem)] bg p-10 rounded-lg hover-outline">
-              Siema {index} &rarr;
+          <Link href={`post/${post.id}`} key={post.id} passHref>
+            <div className="w-full sm:w-[calc(50%-1rem)] bg p-10 rounded-lg hover-outline truncate">
+              {post.title} &rarr;
             </div>
           </Link>
         );
