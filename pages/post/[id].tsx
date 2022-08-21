@@ -1,8 +1,5 @@
-import type {
-  NextPage,
-  GetServerSideProps,
-  GetServerSidePropsContext,
-} from "next";
+import type { NextPage, GetStaticPaths, GetStaticProps } from "next";
+import { ParsedUrlQuery } from "querystring";
 import { useState } from "react";
 
 import prisma from "../../lib/prisma";
@@ -28,8 +25,6 @@ const PostPage: NextPage<{ post: Post }> = ({ post }) => {
   const [selectedImgUrl, setImageSelectedUrl] = useState(
     post.images[0]?.url || ""
   );
-
-  const handleSelectImg = () => {};
 
   return (
     <div>
@@ -74,23 +69,30 @@ const PostPage: NextPage<{ post: Post }> = ({ post }) => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async (
-  context: GetServerSidePropsContext
-) => {
-  const id = context.params?.id;
+export const getStaticPaths: GetStaticPaths = async () => {
+  const posts = await prisma.post.findMany({
+    select: {
+      id: true,
+    },
+  });
 
-  if (!id || typeof id !== "string") {
-    return {
-      redirect: {
-        destination: "/",
-        permanent: false,
-      },
-    };
-  }
+  const paths = posts.map((post) => ({
+    params: { id: post.id },
+  }));
+
+  return { paths, fallback: false };
+};
+
+interface IParams extends ParsedUrlQuery {
+  id: string;
+}
+
+export const getStaticProps: GetStaticProps = async (context) => {
+  const { id } = context.params as IParams;
 
   const post = await prisma.post.findUnique({
     where: {
-      id: id,
+      id,
     },
     select: {
       id: true,
@@ -114,12 +116,72 @@ export const getServerSideProps: GetServerSideProps = async (
     },
   });
 
+  console.log(post);
+
+  if (!post) {
+    return {
+      redirect: {
+        destination: "/",
+      },
+    };
+  }
+
   // @ts-ignore
   post.createdAt = post?.createdAt.toJSON();
   // @ts-ignore
   post.updatedAt = post?.updatedAt.toJSON();
 
-  return { props: { post } };
+  return {
+    props: { post },
+  };
 };
+
+// export const getServerSideProps: GetServerSideProps = async (
+//   context: GetServerSidePropsContext
+// ) => {
+//   const id = context.params?.id;
+
+//   if (!id || typeof id !== "string") {
+//     return {
+//       redirect: {
+//         destination: "/",
+//         permanent: false,
+//       },
+//     };
+//   }
+
+//   const post = await prisma.post.findUnique({
+//     where: {
+//       id: id,
+//     },
+//     select: {
+//       id: true,
+//       title: true,
+//       content: true,
+//       createdAt: true,
+//       updatedAt: true,
+//       author: {
+//         select: {
+//           id: true,
+//           name: true,
+//           profilePicture: true,
+//         },
+//       },
+//       images: {
+//         select: {
+//           id: true,
+//           url: true,
+//         },
+//       },
+//     },
+//   });
+
+//   // @ts-ignore
+//   post.createdAt = post?.createdAt.toJSON();
+//   // @ts-ignore
+//   post.updatedAt = post?.updatedAt.toJSON();
+
+//   return { props: { post } };
+// };
 
 export default PostPage;
