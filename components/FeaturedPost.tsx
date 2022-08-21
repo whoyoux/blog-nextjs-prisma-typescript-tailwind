@@ -19,7 +19,7 @@ const FeaturedPost = ({
   imgUrl,
 }: FeaturedPostType) => {
   return (
-    <Link href={`post/${id}`} passHref>
+    <Link href={`posts/${id}`} passHref>
       <article className="bg w-full flex flex-col gap-8 sm:flex-row rounded-lg hover-outline">
         <div className="sm:flex-1 pt-8 sm:pt-10 px-10 sm:rounded-l-lg">
           <h1 className="text-2xl cursor-pointer">{title}</h1>
