@@ -46,13 +46,6 @@ export const getStaticProps: GetStaticProps = async () => {
       content: true,
       createdAt: true,
       updatedAt: true,
-      // author: {
-      //   select: {
-      //     id: true,
-      //     name: true,
-      //     image: true,
-      //   },
-      // },
       images: {
         select: {
           id: true,

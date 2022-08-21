@@ -44,18 +44,15 @@ export default async function handler(
       },
     });
 
-    console.log(posts);
-
     const revalidatePaths = posts.map((post) => {
-      res.revalidate(`/post/${post.id}`);
+      res.revalidate(`/posts/${post.id}`);
     });
-
-    console.log(await revalidatePaths);
 
     await Promise.all(revalidatePaths);
 
     return res.json({ revalidated: true });
   } catch (err) {
+    console.log(err);
     return res.status(500).send("Error revalidating");
   }
 }
