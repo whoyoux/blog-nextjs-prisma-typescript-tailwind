@@ -17,6 +17,7 @@ import { TrashSimple, PencilSimple, ArrowsClockwise } from "phosphor-react";
 
 import toast from "react-hot-toast";
 import { useState } from "react";
+import { useRouter } from "next/router";
 
 type EditorPageType = {
   posts: PostType[];
@@ -28,6 +29,8 @@ const Editor: NextPage<EditorPageType> = ({ posts }) => {
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+
+  const router = useRouter();
 
   const handleUpdateButton = (id: string) => {
     setEditingPostId(id);
@@ -192,7 +195,12 @@ const Editor: NextPage<EditorPageType> = ({ posts }) => {
                   className="flex flex-row items-center justify-between hover-outline sm:p-5 py -2 rounded-lg"
                 >
                   <div>
-                    <h2 className="text-xl">{post.title}</h2>
+                    <h2
+                      className="text-xl cursor-pointer hover:underline"
+                      onClick={() => router.push(`/posts/${post.id}`)}
+                    >
+                      {post.title}
+                    </h2>
                     <h4 className="text-white/50 text-xs">
                       {dateFormatter.format(Date.parse(post.createdAt))}
                     </h4>
