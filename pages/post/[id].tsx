@@ -80,7 +80,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
     params: { id: post.id },
   }));
 
-  return { paths, fallback: false };
+  return { paths, fallback: "blocking" };
 };
 
 interface IParams extends ParsedUrlQuery {

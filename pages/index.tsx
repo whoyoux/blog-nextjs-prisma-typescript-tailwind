@@ -6,26 +6,13 @@ import RecentPosts from "../components/RecentPosts";
 
 import prisma from "../lib/prisma";
 
-type PostType = {
-  id: string;
-  title: string;
-  content: string;
-  createdAt: string;
-  updatedAt: string;
-  images: [
-    {
-      id: string;
-      url: string;
-    }
-  ];
-};
+import { PostType } from "../types";
 
 type HomePageType = {
   posts: PostType[];
 };
 
 const Home: NextPage<HomePageType> = ({ posts }) => {
-  console.log(posts);
   return (
     <>
       <Head>

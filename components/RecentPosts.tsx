@@ -1,19 +1,6 @@
-import { createArray } from "dummy-array";
 import Link from "next/link";
 
-type PostType = {
-  id: string;
-  title: string;
-  content: string;
-  createdAt: string;
-  updatedAt: string;
-  images: [
-    {
-      id: string;
-      url: string;
-    }
-  ];
-};
+import { PostType } from "../types";
 
 const RecentPosts = ({ posts }: { posts: PostType[] }) => {
   return (

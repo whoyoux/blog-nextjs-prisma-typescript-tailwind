@@ -16,4 +16,4 @@ type PostType = {
   ];
 };
 
-export {};
+export { PostType };
