@@ -33,8 +33,7 @@ const Editor: NextPage<EditorPageType> = ({ posts }) => {
   const handleRevalidate = async () => {
     const revalidateToastId = toast.loading("Loading...");
     try {
-      const response = await fetch(`http://localhost:3000/api/revalidate`);
-      console.log(response);
+      const response = await fetch(`/api/revalidate`);
       if (!response.ok) {
         toast.error("Error!", {
           id: revalidateToastId,
