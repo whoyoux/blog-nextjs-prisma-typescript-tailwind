@@ -10,8 +10,10 @@ const Header = () => {
       <h1 className="text-3xl hover:underline">
         <Link href="/">Blog</Link>
       </h1>
-      <div className="text-xl hover:underline">
+      {session && <Link href="/editor">editor</Link>}
+      <div className="text-xl cursor-pointer hover:underline">
         {/* <Link href="/about">about</Link> */}
+
         {!session ? (
           <h1 onClick={() => signIn("google")}>about</h1>
         ) : (

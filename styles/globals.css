@@ -17,6 +17,10 @@
     @apply cursor-pointer hover:outline hover:outline-2 hover:outline-blue-500;
   }
 
+  .input-text {
+    @apply bg w-full btn appearance-none border-none outline-blue-500 focus:outline focus:outline-2 focus:outline-blue-500;
+  }
+
   .btn {
     @apply px-3.5 py-3 rounded;
   }

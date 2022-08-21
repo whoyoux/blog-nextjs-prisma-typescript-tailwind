@@ -1,12 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
-import prisma from "../../lib/prisma";
+import prisma from "../../../lib/prisma";
 
-import { authOptions } from "./auth/[...nextauth]";
+import { authOptions } from "../auth/[...nextauth]";
 import { unstable_getServerSession } from "next-auth/next";
 import { Role } from "@prisma/client";
 
-import rateLimit from "../../lib/rateLimit";
+import rateLimit from "../../../lib/rateLimit";
 
 const limiter = rateLimit({
   interval: 60 * 1000, // 60 seconds
@@ -17,7 +17,23 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  if (req.method !== "POST") return res.status(400).json({ error: true });
+
   try {
+    const { id, title, content } = req.body;
+
+    if (
+      !id ||
+      !title ||
+      !content ||
+      typeof id !== "string" ||
+      typeof title !== "string" ||
+      typeof content !== "string"
+    ) {
+      res.status(401).json({ message: "Not enough arguments." });
+      return;
+    }
+
     await limiter.check(res, 10, "CACHE_TOKEN"); // 10 requests per minute
 
     const session = await unstable_getServerSession(req, res, authOptions);
@@ -47,19 +63,18 @@ export default async function handler(
       return;
     }
 
-    const posts = await prisma.post.findMany({
-      select: {
-        id: true,
+    await prisma.post.update({
+      where: {
+        id,
+      },
+      data: {
+        title,
+        content,
       },
     });
 
-    const revalidatePaths = posts.map((post) => {
-      res.revalidate(`/posts/${post.id}`);
-    });
-
-    await Promise.all(revalidatePaths);
-
-    return res.json({ revalidated: true });
+    res.revalidate(`/posts/${id}`);
+    return res.json({ updated: true });
   } catch (err) {
     return res.status(500).send("Error revalidating");
   }
