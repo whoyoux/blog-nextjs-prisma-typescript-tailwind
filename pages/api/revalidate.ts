@@ -6,11 +6,20 @@ import { authOptions } from "./auth/[...nextauth]";
 import { unstable_getServerSession } from "next-auth/next";
 import { Role } from "@prisma/client";
 
+import rateLimit from "../../lib/rateLimit";
+
+const limiter = rateLimit({
+  interval: 60 * 1000, // 60 seconds
+  uniqueTokenPerInterval: 100, // Max 100 users per second
+});
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
   try {
+    await limiter.check(res, 10, "CACHE_TOKEN"); // 10 requests per minute
+
     const session = await unstable_getServerSession(req, res, authOptions);
 
     if (
@@ -52,7 +61,6 @@ export default async function handler(
 
     return res.json({ revalidated: true });
   } catch (err) {
-    console.log(err);
     return res.status(500).send("Error revalidating");
   }
 }

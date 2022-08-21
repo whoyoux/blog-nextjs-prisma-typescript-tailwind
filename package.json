@@ -13,6 +13,7 @@
     "@prisma/client": "4.2.1",
     "@tailwindcss/line-clamp": "^0.4.0",
     "dummy-array": "^1.0.3",
+    "lru-cache": "^7.14.0",
     "next": "12.2.5",
     "next-auth": "^4.10.3",
     "phosphor-react": "^1.4.1",
