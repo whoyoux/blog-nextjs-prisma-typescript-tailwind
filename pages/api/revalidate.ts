@@ -2,11 +2,42 @@ import type { NextApiRequest, NextApiResponse } from "next";
 
 import prisma from "../../lib/prisma";
 
+import { authOptions } from "./auth/[...nextauth]";
+import { unstable_getServerSession } from "next-auth/next";
+import { Role } from "@prisma/client";
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
   try {
+    const session = await unstable_getServerSession(req, res, authOptions);
+
+    if (
+      !session ||
+      !session.user ||
+      !session.user.email ||
+      typeof session.user.email !== "string"
+    ) {
+      res.status(401).json({ message: "You must be logged in." });
+      return;
+    }
+
+    const user = await prisma.user.findUnique({
+      where: {
+        email: session.user?.email,
+      },
+      select: {
+        email: true,
+        role: true,
+      },
+    });
+
+    if (!user || !user.email || user.role !== Role.ADMIN) {
+      res.status(401).json({ message: "You don't have enough privileges." });
+      return;
+    }
+
     const posts = await prisma.post.findMany({
       select: {
         id: true,
@@ -19,7 +50,7 @@ export default async function handler(
       res.revalidate(`/post/${post.id}`);
     });
 
-    console.log(revalidatePaths);
+    console.log(await revalidatePaths);
 
     await Promise.all(revalidatePaths);
 

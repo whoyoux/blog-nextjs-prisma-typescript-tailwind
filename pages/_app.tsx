@@ -3,13 +3,17 @@ import type { AppProps } from "next/app";
 
 import Layout from "../layout/Layout";
 
-function MyApp({ Component, pageProps }: AppProps) {
+import { SessionProvider } from "next-auth/react";
+
+function MyApp({ Component, pageProps: { session, ...pageProps } }: AppProps) {
   return (
-    <div className="mx-10">
-      <Layout>
-        <Component {...pageProps} />
-      </Layout>
-    </div>
+    <SessionProvider session={session}>
+      <div className="mx-10">
+        <Layout>
+          <Component {...pageProps} />
+        </Layout>
+      </div>
+    </SessionProvider>
   );
 }
 

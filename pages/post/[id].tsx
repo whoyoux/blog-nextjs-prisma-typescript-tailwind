@@ -104,7 +104,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
         select: {
           id: true,
           name: true,
-          profilePicture: true,
+          image: true,
         },
       },
       images: {
