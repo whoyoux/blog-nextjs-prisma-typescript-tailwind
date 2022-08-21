@@ -116,16 +116,6 @@ export const getStaticProps: GetStaticProps = async (context) => {
     },
   });
 
-  console.log(post);
-
-  if (!post) {
-    return {
-      redirect: {
-        destination: "/",
-      },
-    };
-  }
-
   // @ts-ignore
   post.createdAt = post?.createdAt.toJSON();
   // @ts-ignore
