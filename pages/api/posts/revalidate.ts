@@ -57,7 +57,7 @@ export default async function handler(
       res.revalidate(`/posts/${post.id}`);
     });
 
-    await Promise.all(revalidatePaths);
+    await Promise.all([...revalidatePaths, res.revalidate(`/`)]);
 
     return res.json({ revalidated: true });
   } catch (err) {

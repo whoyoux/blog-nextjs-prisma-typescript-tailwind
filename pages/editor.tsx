@@ -12,6 +12,7 @@ import { Role } from "@prisma/client";
 
 import dateFormatter from "../lib/dateFormatter";
 import { PostType } from "../types";
+import makeRequest from "../lib/makeRequest";
 
 import { TrashSimple, PencilSimple, ArrowsClockwise } from "phosphor-react";
 
@@ -47,68 +48,34 @@ const Editor: NextPage<EditorPageType> = ({ posts }) => {
 
   const handleDeleteButton = async (id: string) => {
     if (confirm("Are you sure?")) {
-      const deleteToastId = toast.loading("Removing...");
-      try {
-        const response = await fetch(`/api/posts/delete`, {
-          method: "DELETE",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            id,
-          }),
-        });
-        if (!response.ok) {
-          toast.error("Error!", {
-            id: deleteToastId,
-          });
-        } else {
-          toast.success("Deleted!", {
-            id: deleteToastId,
-          });
-        }
-      } catch (err) {
-        toast.error("Error!", {
-          id: deleteToastId,
-        });
-        console.error(err);
-      }
+      makeRequest({
+        url: `/api/posts/delete`,
+        method: "DELETE",
+        body: {
+          id,
+        },
+        loadingText: "Removing...",
+        errorText: "Error!",
+        successText: "Updated!",
+        fnAfterSuccess: router.reload,
+      });
     }
   };
 
   const handleSubmitEditPost = async () => {
-    const editingToastId = toast.loading("Editing...");
-    try {
-      const response = await fetch(`/api/posts/update`, {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          id: editingPostId,
-          title,
-          content,
-        }),
-      });
-      if (!response.ok) {
-        toast.error("Error!", {
-          id: editingToastId,
-        });
-      } else {
-        toast.success("Updated!", {
-          id: editingToastId,
-        });
-        // handleGoBackToList();
-        router.reload();
-      }
-    } catch (err) {
-      toast.error("Error!", {
-        id: editingToastId,
-      });
-      console.error(err);
-    }
+    makeRequest({
+      url: `/api/posts/update`,
+      method: "POST",
+      body: {
+        id: editingPostId,
+        title,
+        content,
+      },
+      loadingText: "Editing...",
+      errorText: "Error!",
+      successText: "Removed!",
+      fnAfterSuccess: router.reload,
+    });
   };
 
   const handleGoBackToList = () => {
@@ -273,7 +240,8 @@ export const getServerSideProps: GetServerSideProps = async (
     },
   });
 
-  if (!user || !user.email || user.role !== (Role.ADMIN || Role.WRITER)) {
+  if (!user || !user.email || user.role === Role.USER) {
+    console.log(user?.role);
     return {
       redirect: {
         destination: "/",
@@ -282,7 +250,7 @@ export const getServerSideProps: GetServerSideProps = async (
     };
   }
 
-  const posts = await prisma.post.findMany({
+  let findPostsQuery = {
     where: {
       published: true,
       author: {
@@ -296,7 +264,14 @@ export const getServerSideProps: GetServerSideProps = async (
       published: true,
       createdAt: true,
     },
-  });
+  };
+
+  if (user.role === Role.ADMIN) {
+    // @ts-ignore
+    delete findPostsQuery.where;
+  }
+
+  const posts = await prisma.post.findMany(findPostsQuery);
 
   posts.forEach((post) => {
     // @ts-ignore
