@@ -17,7 +17,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  if (req.method !== "POST") return res.status(400).json({ error: true });
+  if (req.method !== "PUT") return res.status(400).json({ error: true });
 
   try {
     const { id, title, content } = req.body;
