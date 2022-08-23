@@ -65,7 +65,7 @@ const Editor: NextPage<EditorPageType> = ({ posts }) => {
   const handleSubmitEditPost = async () => {
     makeRequest({
       url: `/api/posts/update`,
-      method: "POST",
+      method: "PUT",
       body: {
         id: editingPostId,
         title,
