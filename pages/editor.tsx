@@ -16,9 +16,10 @@ import makeRequest from "../lib/makeRequest";
 
 import { TrashSimple, PencilSimple, ArrowsClockwise } from "phosphor-react";
 
-import toast from "react-hot-toast";
 import { useState } from "react";
 import { useRouter } from "next/router";
+
+import Switch from "../components/ToggleSwitch";
 
 type EditorPageType = {
   posts: PostType[];
@@ -27,6 +28,9 @@ type EditorPageType = {
 const Editor: NextPage<EditorPageType> = ({ posts }) => {
   const [editingPostId, setEditingPostId] = useState<string | null>(null);
   const [selectedPost, setSelectedPost] = useState<PostType | null>(null);
+
+  const [publishedSwitchValue, setPublishedSwitchValue] =
+    useState<boolean>(false);
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -42,6 +46,7 @@ const Editor: NextPage<EditorPageType> = ({ posts }) => {
 
     setTitle(selectedPost.title);
     setContent(selectedPost.content);
+    setPublishedSwitchValue(selectedPost.published);
 
     console.log(`Updated post of id: ${id}`);
   };
@@ -70,10 +75,11 @@ const Editor: NextPage<EditorPageType> = ({ posts }) => {
         id: editingPostId,
         title,
         content,
+        published: publishedSwitchValue,
       },
       loadingText: "Editing...",
       errorText: "Error!",
-      successText: "Removed!",
+      successText: "Updated!",
       fnAfterSuccess: router.reload,
     });
   };
@@ -84,24 +90,13 @@ const Editor: NextPage<EditorPageType> = ({ posts }) => {
   };
 
   const handleRevalidate = async () => {
-    const revalidateToastId = toast.loading("Loading...");
-    try {
-      const response = await fetch(`/api/posts/revalidate`);
-      if (!response.ok) {
-        toast.error("Error!", {
-          id: revalidateToastId,
-        });
-      } else {
-        toast.success("Revalidated!", {
-          id: revalidateToastId,
-        });
-      }
-    } catch (err) {
-      toast.error("Error!", {
-        id: revalidateToastId,
-      });
-      console.error(err);
-    }
+    makeRequest({
+      url: `/api/posts/revalidate`,
+      method: "POST",
+      loadingText: "Loading...",
+      errorText: "Error!",
+      successText: "Revalidated!",
+    });
   };
 
   return (
@@ -130,6 +125,16 @@ const Editor: NextPage<EditorPageType> = ({ posts }) => {
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 className="input-text"
+              />
+            </div>
+            <div>
+              <Switch
+                enabled={publishedSwitchValue}
+                onClick={() => {
+                  setPublishedSwitchValue((prev) => !prev);
+                }}
+                withText
+                textLabel="Published"
               />
             </div>
             <div className="flex justify-end">
@@ -261,8 +266,8 @@ export const getServerSideProps: GetServerSideProps = async (
       id: true,
       title: true,
       content: true,
-      published: true,
       createdAt: true,
+      published: true,
     },
   };
 

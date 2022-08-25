@@ -62,7 +62,7 @@ export const getStaticProps: GetStaticProps = async () => {
     post.updatedAt = post.updatedAt.toJSON();
   });
 
-  return { props: { posts }, revalidate: 60 };
+  return { props: { posts }, revalidate: 1 };
 };
 
 export default Home;

@@ -20,6 +20,11 @@ export default async function handler(
   try {
     await limiter.check(res, 10, "CACHE_TOKEN"); // 10 requests per minute
 
+    if (req.method !== "POST")
+      return res
+        .status(400)
+        .json({ message: "Method not allowed", error: true });
+
     const session = await unstable_getServerSession(req, res, authOptions);
 
     if (

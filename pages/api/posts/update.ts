@@ -17,10 +17,11 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  if (req.method !== "PUT") return res.status(400).json({ error: true });
+  if (req.method !== "PUT")
+    return res.status(400).json({ message: "Method not allowed", error: true });
 
   try {
-    const { id, title, content } = req.body;
+    const { id, title, content, published } = req.body;
 
     if (
       !id ||
@@ -28,8 +29,10 @@ export default async function handler(
       !content ||
       typeof id !== "string" ||
       typeof title !== "string" ||
-      typeof content !== "string"
+      typeof content !== "string" ||
+      typeof published !== "boolean"
     ) {
+      console.log(req.body);
       res.status(401).json({ message: "Not enough arguments." });
       return;
     }
@@ -70,6 +73,7 @@ export default async function handler(
       data: {
         title,
         content,
+        published,
       },
     });
 

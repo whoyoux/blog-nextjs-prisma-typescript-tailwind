@@ -1,13 +1,16 @@
+// import { Post } from "@prisma/client";
+
 declare global {
   var prisma: PrismaClient;
 }
 
-type PostType = {
+export type PostType = {
   id: string;
   title: string;
   content: string;
   createdAt: string;
   updatedAt: string;
+  published: boolean;
   images: [
     {
       id: string;
@@ -15,5 +18,3 @@ type PostType = {
     }
   ];
 };
-
-export { PostType };
