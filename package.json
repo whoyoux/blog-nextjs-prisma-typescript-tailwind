@@ -17,6 +17,7 @@
     "lru-cache": "^7.14.0",
     "next": "12.2.5",
     "next-auth": "^4.10.3",
+    "nextjs-progressbar": "^0.0.14",
     "phosphor-react": "^1.4.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
