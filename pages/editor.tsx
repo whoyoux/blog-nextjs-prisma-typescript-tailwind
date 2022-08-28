@@ -105,6 +105,22 @@ const Editor: NextPage<EditorPageType> = ({ posts, role }) => {
     });
   };
 
+  const handleAcceptPost = async () => {
+    if (confirm("Are you sure? Edited data will be lost")) {
+      await makeRequest({
+        url: `/api/posts/accept`,
+        method: "PUT",
+        loadingText: "Accepting...",
+        errorText: "Couldn't accept!",
+        successText: "Accepted!",
+        body: {
+          id: selectedPost!.id,
+        },
+        fnAfterSuccess: router.reload,
+      });
+    }
+  };
+
   return (
     <div>
       {editingPostId ? (
@@ -147,7 +163,7 @@ const Editor: NextPage<EditorPageType> = ({ posts, role }) => {
               {!selectedPost?.accepted && (
                 <button
                   className="btn bg-indigo-600 hover:bg-indigo-700 transition-all"
-                  onClick={handleSubmitEditPost}
+                  onClick={handleAcceptPost}
                 >
                   Accept
                 </button>
