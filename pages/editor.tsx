@@ -4,30 +4,33 @@ import type {
   NextPage,
 } from "next";
 
-import { authOptions } from "./api/auth/[...nextauth]";
 import { unstable_getServerSession } from "next-auth/next";
+import { authOptions } from "./api/auth/[...nextauth]";
 
-import prisma from "../lib/prisma";
 import { Role } from "@prisma/client";
+import prisma from "../lib/prisma";
 
 import dateFormatter from "../lib/dateFormatter";
-import { PostType } from "../types";
 import makeRequest from "../lib/makeRequest";
+import { PostType } from "../types";
 
-import { TrashSimple, PencilSimple, ArrowsClockwise } from "phosphor-react";
+import { ArrowsClockwise, PencilSimple, TrashSimple } from "phosphor-react";
 
-import { useState } from "react";
 import { useRouter } from "next/router";
+import { useState } from "react";
 
 import Switch from "../components/ToggleSwitch";
 
 type EditorPageType = {
   posts: PostType[];
+  role: "WRITER" | "MODERATOR" | "ADMIN";
 };
 
-const Editor: NextPage<EditorPageType> = ({ posts }) => {
+const Editor: NextPage<EditorPageType> = ({ posts, role }) => {
   const [editingPostId, setEditingPostId] = useState<string | null>(null);
   const [selectedPost, setSelectedPost] = useState<PostType | null>(null);
+
+  const [isRevalidating, setIsRevalidating] = useState<boolean>(false);
 
   const [publishedSwitchValue, setPublishedSwitchValue] =
     useState<boolean>(false);
@@ -53,7 +56,7 @@ const Editor: NextPage<EditorPageType> = ({ posts }) => {
 
   const handleDeleteButton = async (id: string) => {
     if (confirm("Are you sure?")) {
-      makeRequest({
+      await makeRequest({
         url: `/api/posts/delete`,
         method: "DELETE",
         body: {
@@ -68,7 +71,7 @@ const Editor: NextPage<EditorPageType> = ({ posts }) => {
   };
 
   const handleSubmitEditPost = async () => {
-    makeRequest({
+    await makeRequest({
       url: `/api/posts/update`,
       method: "PUT",
       body: {
@@ -90,12 +93,13 @@ const Editor: NextPage<EditorPageType> = ({ posts }) => {
   };
 
   const handleRevalidate = async () => {
-    makeRequest({
+    await makeRequest({
       url: `/api/posts/revalidate`,
       method: "POST",
       loadingText: "Loading...",
       errorText: "Error!",
       successText: "Revalidated!",
+      setPending: setIsRevalidating,
     });
   };
 
@@ -151,14 +155,27 @@ const Editor: NextPage<EditorPageType> = ({ posts }) => {
         <>
           <div className="w-full flex flex-col sm:flex-row gap-2 sm:gap-0 items-center justify-between mb-8 sm:px-5">
             <h1 className="text-3xl">List of posts:</h1>
+
             <div className="flex gap-5">
               <button className="btn bg">Create</button>
-              <button className="btn bg" onClick={handleRevalidate}>
-                <div className="flex flex-row items-center gap-1">
-                  Revalidate <ArrowsClockwise className="text-xl" />
-                </div>
-              </button>
+              {role === "ADMIN" && (
+                <button
+                  className="btn bg disabled:opacity-50 disabled:cursor-not-allowed"
+                  onClick={handleRevalidate}
+                  disabled={isRevalidating}
+                >
+                  <div className="flex flex-row items-center gap-1">
+                    Revalidate{" "}
+                    <ArrowsClockwise
+                      className={`text-xl ${isRevalidating && "animate-spin"}`}
+                    />
+                  </div>
+                </button>
+              )}
             </div>
+          </div>
+          <div className="sm:px-5 text-xs italic text-white/80 mb-2">
+            <p>/ Deleting make post not published /</p>
           </div>
           <div className="flex flex-col gap-4 sm:gap-1">
             {posts.map((post) => {
@@ -286,7 +303,7 @@ export const getServerSideProps: GetServerSideProps = async (
   });
 
   return {
-    props: { posts },
+    props: { posts, role: user.role },
   };
 };
 

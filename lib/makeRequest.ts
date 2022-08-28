@@ -1,3 +1,4 @@
+import type { Dispatch, SetStateAction } from "react";
 import toast from "react-hot-toast";
 
 type MethodType = "POST" | "GET" | "PUT" | "DELETE" | "PATCH";
@@ -9,6 +10,7 @@ type MakeRequestType = {
   loadingText: string;
   errorText: string;
   successText: string;
+  setPending?: Dispatch<SetStateAction<boolean>>;
   fnAfterSuccess?: () => void;
   fnAfterError?: () => void;
 };
@@ -20,10 +22,12 @@ const makeRequest = async ({
   loadingText,
   errorText,
   successText,
+  setPending,
   fnAfterSuccess = () => {},
   fnAfterError = () => {},
 }: MakeRequestType) => {
   const deleteToastId = toast.loading(loadingText);
+  setPending && setPending(true);
   try {
     const response = await fetch(url, {
       method,
@@ -38,11 +42,13 @@ const makeRequest = async ({
         id: deleteToastId,
       });
       fnAfterError();
+      setPending && setPending(false);
     } else {
       toast.success(successText, {
         id: deleteToastId,
       });
       fnAfterSuccess();
+      setPending && setPending(false);
     }
   } catch (err) {
     toast.error(errorText, {
@@ -50,6 +56,7 @@ const makeRequest = async ({
     });
     // console.error(err);
     fnAfterError();
+    setPending && setPending(false);
   }
 };
 
