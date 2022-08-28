@@ -63,23 +63,26 @@ model User {
   accounts      Account[]
   sessions      Session[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  Post      Post[]
-  role      Role     @default(USER)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  posts         Post[]
+  role          Role     @default(USER)
+  acceptedPosts Post[]   @relation(name: "acceptedBy")
 }
 
 model Post {
-  id        String   @id @default(cuid())
-  title     String
-  content   String   @db.LongText
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  published Boolean  @default(false)
-  accepted  Boolean  @default(false)
-  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  authorId  String
-  images    Image[]
+  id           String   @id @default(cuid())
+  title        String
+  content      String   @db.LongText
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  published    Boolean  @default(false)
+  accepted     Boolean  @default(false)
+  acceptedBy   User?    @relation(name: "acceptedBy", fields: [acceptedById], references: [id])
+  acceptedById String?
+  author       User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId     String
+  images       Image[]
 }
 
 model Image {

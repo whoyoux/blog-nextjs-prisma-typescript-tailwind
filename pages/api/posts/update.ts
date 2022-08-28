@@ -80,6 +80,6 @@ export default async function handler(
     res.revalidate(`/posts/${id}`);
     return res.json({ updated: true });
   } catch (err) {
-    return res.status(500).send("Error revalidating");
+    return res.status(500).send("Error updating");
   }
 }

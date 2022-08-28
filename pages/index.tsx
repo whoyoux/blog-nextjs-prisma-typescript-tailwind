@@ -13,6 +13,16 @@ type HomePageType = {
 };
 
 const Home: NextPage<HomePageType> = ({ posts }) => {
+  if (posts.length < 1)
+    return (
+      <>
+        <h1 className="text-3xl">Please stand by!</h1>
+        <h2 className="text-xl mt-5">
+          Our website is currently down. We&apos;re working on this.
+        </h2>
+      </>
+    );
+
   return (
     <>
       <Head>
@@ -39,6 +49,7 @@ export const getStaticProps: GetStaticProps = async () => {
   const posts = await prisma.post.findMany({
     where: {
       published: true,
+      accepted: true,
     },
     select: {
       id: true,

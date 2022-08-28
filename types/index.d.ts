@@ -11,6 +11,7 @@ export type PostType = {
   createdAt: string;
   updatedAt: string;
   published: boolean;
+  accepted: boolean;
   images: [
     {
       id: string;

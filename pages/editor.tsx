@@ -30,6 +30,8 @@ const Editor: NextPage<EditorPageType> = ({ posts, role }) => {
   const [editingPostId, setEditingPostId] = useState<string | null>(null);
   const [selectedPost, setSelectedPost] = useState<PostType | null>(null);
 
+  console.log(posts);
+
   const [isRevalidating, setIsRevalidating] = useState<boolean>(false);
 
   const [publishedSwitchValue, setPublishedSwitchValue] =
@@ -186,10 +188,15 @@ const Editor: NextPage<EditorPageType> = ({ posts, role }) => {
                 >
                   <div>
                     <h2
-                      className="text-xl cursor-pointer hover:underline"
+                      className={`text-xl cursor-pointer hover:underline`}
                       onClick={() => router.push(`/posts/${post.id}`)}
                     >
-                      {post.title}
+                      {post.title}{" "}
+                      {!post.accepted && (
+                        <span className="text-red-500 italic text-xs">
+                          NOT ACCEPTED
+                        </span>
+                      )}
                     </h2>
                     <h4 className="text-white/50 text-xs">
                       {dateFormatter.format(Date.parse(post.createdAt))}
@@ -285,6 +292,14 @@ export const getServerSideProps: GetServerSideProps = async (
       content: true,
       createdAt: true,
       published: true,
+      images: true,
+      accepted: true,
+      author: {
+        select: {
+          name: true,
+          image: true,
+        },
+      },
     },
   };
 
