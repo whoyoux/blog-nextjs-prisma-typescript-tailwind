@@ -15,48 +15,22 @@ type Post = {
     name: string;
     profilePicture: string;
   };
-  images: {
-    id: string;
-    url: string;
-  }[];
+  imageUrl: string;
 };
 
 const PostPage: NextPage<{ post: Post }> = ({ post }) => {
-  const [selectedImgUrl, setImageSelectedUrl] = useState(
-    post.images[0]?.url || ""
-  );
-
   return (
     <div>
-      {post.images.length > 0 && (
+      {post.imageUrl && (
         <div className="w-full">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={selectedImgUrl}
+            src={post.imageUrl}
             alt="img"
             width={200}
             height={200}
             className="rounded-lg mx-auto my-10"
           />
-
-          <div className="flex flex-row w-full justify-center gap-5 mb-10">
-            {post.images.length > 1 &&
-              post.images.map((image) => {
-                return (
-                  <div key={image.id}>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={image.url}
-                      alt="image"
-                      width={50}
-                      height={50}
-                      className="rounded cursor-pointer"
-                      onMouseEnter={() => setImageSelectedUrl(image.url)}
-                    />
-                  </div>
-                );
-              })}
-          </div>
         </div>
       )}
       <h1 className="text-3xl mb-10">{post.title}</h1>
@@ -110,12 +84,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
           image: true,
         },
       },
-      images: {
-        select: {
-          id: true,
-          url: true,
-        },
-      },
+      imageUrl: true,
     },
   });
 

@@ -1,5 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
+import { z } from "zod";
+
 import prisma from "../../../lib/prisma";
 
 import { authOptions } from "../auth/[...nextauth]";
@@ -17,17 +19,21 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  if (req.method !== "PUT")
+  if (req.method !== "POST")
     return res.status(400).json({ message: "Method not allowed", error: true });
 
   try {
-    const { id } = req.body;
+    const createPostSchema = z.object({
+      title: z.string().min(1),
+      content: z.string().min(1),
+      imageUrl: z.string(),
+    });
+    console.log(req.body);
+    createPostSchema.parse(req.body);
 
-    if (!id || typeof id !== "string") {
-      console.log(req.body);
-      res.status(401).json({ message: "Not enough arguments." });
-      return;
-    }
+    type PostType = z.infer<typeof createPostSchema>;
+
+    const { title, content, imageUrl }: PostType = req.body;
 
     await limiter.check(res, 10, "CACHE_TOKEN"); // 10 requests per minute
 
@@ -55,19 +61,17 @@ export default async function handler(
       },
     });
 
-    if (!user || !user.email || user.role !== Role.ADMIN) {
+    if (!user || !user.email || user.role === Role.USER) {
       res.status(401).json({ message: "You don't have enough privileges." });
       return;
     }
 
-    await prisma.post.update({
-      where: {
-        id,
-      },
+    await prisma.post.create({
       data: {
-        published: true,
-        accepted: true,
-        acceptedBy: {
+        title,
+        content,
+        imageUrl,
+        author: {
           connect: {
             id: user.id,
           },
@@ -75,9 +79,11 @@ export default async function handler(
       },
     });
 
-    res.revalidate(`/posts/${id}`);
-    return res.json({ updated: true });
+    return res.json({
+      success: true,
+    });
   } catch (err) {
-    return res.status(500).send("Error updating");
+    console.log(err);
+    return res.status(500).send("Error adding an image");
   }
 }

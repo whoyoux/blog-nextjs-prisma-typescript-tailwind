@@ -82,11 +82,5 @@ model Post {
   acceptedById String?
   author       User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
   authorId     String
-  images       Image[]
-}
-
-model Image {
-  id    String @id @default(cuid())
-  url   String
-  posts Post[]
+  imageUrl     String
 }

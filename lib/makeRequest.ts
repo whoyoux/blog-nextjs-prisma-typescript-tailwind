@@ -50,6 +50,7 @@ const makeRequest = async ({
       fnAfterSuccess();
       setPending && setPending(false);
     }
+    return response.json();
   } catch (err) {
     toast.error(errorText, {
       id: deleteToastId,
@@ -57,6 +58,7 @@ const makeRequest = async ({
     // console.error(err);
     fnAfterError();
     setPending && setPending(false);
+    return { error: true };
   }
 };
 

@@ -33,6 +33,10 @@ const Editor: NextPage<EditorPageType> = ({ posts, role }) => {
 
   const [isRevalidating, setIsRevalidating] = useState<boolean>(false);
 
+  const [currentState, setCurrentState] = useState<
+    "LIST" | "UPDATE" | "CREATE"
+  >("LIST");
+
   const router = useRouter();
 
   const handleUpdateButton = (id: string) => {
@@ -41,6 +45,12 @@ const Editor: NextPage<EditorPageType> = ({ posts, role }) => {
 
     if (!selectedPost) return;
     setSelectedPost(selectedPost);
+
+    setCurrentState("UPDATE");
+  };
+
+  const handleCreatePost = () => {
+    setCurrentState("CREATE");
   };
 
   const handleDeleteButton = async (id: string) => {
@@ -62,6 +72,7 @@ const Editor: NextPage<EditorPageType> = ({ posts, role }) => {
   const handleGoBackToList = () => {
     setEditingPostId(null);
     setSelectedPost(null);
+    setCurrentState("LIST");
   };
 
   const handleRevalidate = async () => {
@@ -77,18 +88,24 @@ const Editor: NextPage<EditorPageType> = ({ posts, role }) => {
 
   return (
     <div>
-      {editingPostId && selectedPost ? (
+      {currentState === "CREATE" && (
+        <CreatePost goBack={async () => handleGoBackToList()} />
+      )}
+      {currentState === "UPDATE" && (
         <UpdatePost
-          post={selectedPost}
+          post={selectedPost!}
           goBack={async () => handleGoBackToList()}
         />
-      ) : (
+      )}
+      {currentState === "LIST" && (
         <>
           <div className="w-full flex flex-col sm:flex-row gap-2 sm:gap-0 items-center justify-between mb-8 sm:px-5">
             <h1 className="text-3xl">List of posts:</h1>
 
             <div className="flex gap-5">
-              <button className="btn bg">Create</button>
+              <button className="btn bg" onClick={handleCreatePost}>
+                Create
+              </button>
               {role === "ADMIN" && (
                 <button
                   className="btn bg disabled:opacity-50 disabled:cursor-not-allowed"
@@ -221,7 +238,7 @@ export const getServerSideProps: GetServerSideProps = async (
       content: true,
       createdAt: true,
       published: true,
-      images: true,
+      imageUrl: true,
       accepted: true,
       author: {
         select: {

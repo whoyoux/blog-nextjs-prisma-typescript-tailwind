@@ -37,7 +37,7 @@ const Home: NextPage<HomePageType> = ({ posts }) => {
           body={posts[0].content}
           createdAt={posts[0].createdAt}
           updatedAt={posts[0].updatedAt}
-          imgUrl={posts[0].images[0].url}
+          imgUrl={posts[0].imageUrl}
         />
         <RecentPosts posts={posts} />
       </main>
@@ -57,14 +57,11 @@ export const getStaticProps: GetStaticProps = async () => {
       content: true,
       createdAt: true,
       updatedAt: true,
-      images: {
-        select: {
-          id: true,
-          url: true,
-        },
-      },
+      imageUrl: true,
     },
   });
+
+  console.log(posts);
 
   posts.forEach((post) => {
     // @ts-ignore

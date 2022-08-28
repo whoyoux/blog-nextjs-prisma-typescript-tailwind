@@ -12,10 +12,5 @@ export type PostType = {
   updatedAt: string;
   published: boolean;
   accepted: boolean;
-  images: [
-    {
-      id: string;
-      url: string;
-    }
-  ];
+  imageUrl: string;
 };
