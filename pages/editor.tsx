@@ -19,7 +19,8 @@ import { ArrowsClockwise, PencilSimple, TrashSimple } from "phosphor-react";
 import { useRouter } from "next/router";
 import { useState } from "react";
 
-import Switch from "../components/ToggleSwitch";
+import CreatePost from "../components/CreatePost";
+import UpdatePost from "../components/UpdatePost";
 
 type EditorPageType = {
   posts: PostType[];
@@ -30,15 +31,7 @@ const Editor: NextPage<EditorPageType> = ({ posts, role }) => {
   const [editingPostId, setEditingPostId] = useState<string | null>(null);
   const [selectedPost, setSelectedPost] = useState<PostType | null>(null);
 
-  console.log(posts);
-
   const [isRevalidating, setIsRevalidating] = useState<boolean>(false);
-
-  const [publishedSwitchValue, setPublishedSwitchValue] =
-    useState<boolean>(false);
-
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
 
   const router = useRouter();
 
@@ -48,12 +41,6 @@ const Editor: NextPage<EditorPageType> = ({ posts, role }) => {
 
     if (!selectedPost) return;
     setSelectedPost(selectedPost);
-
-    setTitle(selectedPost.title);
-    setContent(selectedPost.content);
-    setPublishedSwitchValue(selectedPost.published);
-
-    console.log(`Updated post of id: ${id}`);
   };
 
   const handleDeleteButton = async (id: string) => {
@@ -72,23 +59,6 @@ const Editor: NextPage<EditorPageType> = ({ posts, role }) => {
     }
   };
 
-  const handleSubmitEditPost = async () => {
-    await makeRequest({
-      url: `/api/posts/update`,
-      method: "PUT",
-      body: {
-        id: editingPostId,
-        title,
-        content,
-        published: publishedSwitchValue,
-      },
-      loadingText: "Editing...",
-      errorText: "Error!",
-      successText: "Updated!",
-      fnAfterSuccess: router.reload,
-    });
-  };
-
   const handleGoBackToList = () => {
     setEditingPostId(null);
     setSelectedPost(null);
@@ -105,78 +75,13 @@ const Editor: NextPage<EditorPageType> = ({ posts, role }) => {
     });
   };
 
-  const handleAcceptPost = async () => {
-    if (confirm("Are you sure? Edited data will be lost")) {
-      await makeRequest({
-        url: `/api/posts/accept`,
-        method: "PUT",
-        loadingText: "Accepting...",
-        errorText: "Couldn't accept!",
-        successText: "Accepted!",
-        body: {
-          id: selectedPost!.id,
-        },
-        fnAfterSuccess: router.reload,
-      });
-    }
-  };
-
   return (
     <div>
-      {editingPostId ? (
-        <div>
-          <button onClick={handleGoBackToList}>&larr; Back to list</button>
-          <div className="mt-10 pt-5 flex flex-col gap-5">
-            <div>
-              <label htmlFor="postTitle">Title</label>
-              <input
-                type="text"
-                name="postTitle"
-                id="postTitle"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                className="input-text"
-              />
-            </div>
-            <div>
-              <label htmlFor="postContent">Content</label>
-              <textarea
-                rows={10}
-                name="postContent"
-                id="postContent"
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                className="input-text"
-              />
-            </div>
-            <div>
-              <Switch
-                enabled={publishedSwitchValue}
-                onClick={() => {
-                  setPublishedSwitchValue((prev) => !prev);
-                }}
-                withText
-                textLabel="Published"
-              />
-            </div>
-            <div className="flex gap-2 justify-end">
-              {!selectedPost?.accepted && (
-                <button
-                  className="btn bg-indigo-600 hover:bg-indigo-700 transition-all"
-                  onClick={handleAcceptPost}
-                >
-                  Accept
-                </button>
-              )}
-              <button
-                className="btn bg-green-600 hover:bg-green-700 transition-all"
-                onClick={handleSubmitEditPost}
-              >
-                Update
-              </button>
-            </div>
-          </div>
-        </div>
+      {editingPostId && selectedPost ? (
+        <UpdatePost
+          post={selectedPost}
+          goBack={async () => handleGoBackToList()}
+        />
       ) : (
         <>
           <div className="w-full flex flex-col sm:flex-row gap-2 sm:gap-0 items-center justify-between mb-8 sm:px-5">
