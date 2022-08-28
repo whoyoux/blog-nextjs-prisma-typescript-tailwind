@@ -143,7 +143,15 @@ const Editor: NextPage<EditorPageType> = ({ posts, role }) => {
                 textLabel="Published"
               />
             </div>
-            <div className="flex justify-end">
+            <div className="flex gap-2 justify-end">
+              {!selectedPost?.accepted && (
+                <button
+                  className="btn bg-indigo-600 hover:bg-indigo-700 transition-all"
+                  onClick={handleSubmitEditPost}
+                >
+                  Accept
+                </button>
+              )}
               <button
                 className="btn bg-green-600 hover:bg-green-700 transition-all"
                 onClick={handleSubmitEditPost}
