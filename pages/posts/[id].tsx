@@ -27,9 +27,7 @@ const PostPage: NextPage<{ post: Post }> = ({ post }) => {
           <img
             src={post.imageUrl}
             alt="img"
-            width={200}
-            height={200}
-            className="rounded-lg mx-auto my-10"
+            className="rounded-lg mx-auto my-10 h-auto w-[200px] sm:w-[250px] md:w-[350px] xl:w-[400px] transition-all"
           />
         </div>
       )}
