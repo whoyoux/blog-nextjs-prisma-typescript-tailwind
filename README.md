@@ -24,7 +24,7 @@ Blog is created using:
 - can do everything what **Moderator** and **Writer**
 - can accept posts
 - can delete posts
-- can revalidate **/posts/\*** path
+- can revalidate **/posts/\*** paths
 
 ## Endpoints
 
