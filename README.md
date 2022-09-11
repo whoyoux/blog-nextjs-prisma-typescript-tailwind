@@ -28,7 +28,7 @@ Blog is created using:
 
 ## Endpoints
 
-All endpoints is **secured** and **rate limited**.
+All endpoints are **secured** and **rate limited**.
 
 - **/auth/\*** - handling **NextAuth**
 - **/posts/**:
